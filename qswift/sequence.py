@@ -75,5 +75,5 @@ class Sequence:
     def get_circuit(self, indices):
         qc = self.initializer.init_circuit(self.observable.nqubit, {}, self.tool)
         for index in indices:
-            self.pool.get(index).add_circuit(qc)
+            self.pool.get(index).add_circuit(qc, sizeOfIndex=len(indices))
         return qc
