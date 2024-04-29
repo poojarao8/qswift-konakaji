@@ -43,7 +43,7 @@ class PauliEvolutionPool(GeneralPool):
 class Sequence:
     def __init__(self, observable: Hamiltonian, initializer: CircuitInitializer,
                  operator_pool=None, taus=None, general_pool=None,
-                 *, nshot=0, tool="qulacs"):
+                 *, nshot=0, tool="qulacs", numQPUs=None):
         """
         :param observable:
         :param initializer:
@@ -63,10 +63,22 @@ class Sequence:
         self.taus = taus
         self.nshot = nshot
         self.tool = tool
+        self.numQPUs = numQPUs
+        self.countQPUs = 0
 
-    def evaluate(self, indices):
+    def evaluate(self, indices, numQPUs=None):
         if self.nshot == 0:
-            return self.observable.exact_value(self.get_circuit(indices))
+            print (indices)
+            if self.numQPUs != None:
+                if self.numQPUs > 1:
+                    obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=True, qpu_id=self.countQPUs % self.numQPUs)
+                    self.countQPUs = self.countQPUs + 1
+                else:
+                    obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=False, qpu_id=0)
+            else:
+                obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=False, qpu_id=0)
+
+            return obsReturn
         res = 0
         for h, p in zip(self.observable.hs, self.observable.paulis):
             res += h * p.get_value(self.get_circuit(indices), self.nshot)
