@@ -64,14 +64,18 @@ class Sequence:
         self.nshot = nshot
         self.tool = tool
         self.numQPUs = numQPUs
+        self.asyncResultArray = []
+        self.QPUjobs = [0] * numQPUs if numQPUs is not None else []
         self.countQPUs = 0
 
     def evaluate(self, indices, numQPUs=None):
         if self.nshot == 0:
-            print (indices)
             if self.numQPUs != None:
                 if self.numQPUs > 1:
-                    obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=True, qpu_id=self.countQPUs % self.numQPUs)
+                    qpuID = self.countQPUs % self.numQPUs
+                    if (qpuID == 3):
+                        qpuID = 4
+                    obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=True, qpu_id=qpuID)
                     self.countQPUs = self.countQPUs + 1
                 else:
                     obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=False, qpu_id=0)
