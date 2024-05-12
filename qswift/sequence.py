@@ -73,8 +73,6 @@ class Sequence:
             if self.numQPUs != None:
                 if self.numQPUs > 1:
                     qpuID = self.countQPUs % self.numQPUs
-                    if (qpuID == 3):
-                        qpuID = 4
                     obsReturn = self.observable.exact_value(self.get_circuit(indices), parallelObserve=True, qpu_id=qpuID)
                     self.countQPUs = self.countQPUs + 1
                 else:
